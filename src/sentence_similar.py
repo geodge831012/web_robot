@@ -122,6 +122,35 @@ class SentenceEmbedding():
             self.all_sentence_list.append(sentence_info_dict)
 
 
+sentence_embedding = SentenceEmbedding()
+
+# 处理所有的预设的句子
+sentence_embedding.proc_intention()
+
+#########################################################################
+## 处理input的句子 ##
+def process_input_sentence(input_sentence):
+
+    input_sentence_embedding, input_sentence_norm = sentence_embedding.get_sentence_embedding(input_sentence)
+
+    # 存放结果集合
+    rst_list = []
+
+    for i in range(len(sentence_embedding.all_sentence_list)):
+        similar_value = get_cosine_value(input_sentence_embedding, \
+                                         sentence_embedding.all_sentence_list[i]["sentence_embedding"], \
+                                         input_sentence_norm, \
+                                         sentence_embedding.all_sentence_list[i]["sentence_norm"])
+
+        rst_list.append((sentence_embedding.all_sentence_list[i]["intention_id"], \
+                         sentence_embedding.all_sentence_list[i]["sentence"], \
+                         similar_value))
+
+    list.sort(rst_list, key=lambda rs: rs[2], reverse=True)
+    print(rst_list[0])
+
+    return rst_list[0][0], rst_list[0][1], rst_list[0][2]
+
 
 
 
