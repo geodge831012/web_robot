@@ -19,7 +19,12 @@ def similarityRequest():
 
     response = {"intention_id": intention_id, "intention_sentence":intention_sentence, "similar_value":similar_value}
 
-    return json.dumps(response), 200, [('Content-Type', 'application/json;charset=utf-8')]
+    rsp = json.dumps(response, ensure_ascii=False)
+
+    print("rsp:" + rsp)
+
+    #return json.dumps(response), 200, [('Content-Type', 'application/json;charset=utf-8')]
+    return rsp, 200, [('Content-Type', 'application/json;charset=utf-8')]
 
 
 
@@ -28,6 +33,6 @@ if __name__ == "__main__":
     print("web_robot start...")
 
     #app.run(debug=True)
-    app.run(debug=False)
+    app.run(host="192.168.9.60", port=5000, debug=False)
 
 
