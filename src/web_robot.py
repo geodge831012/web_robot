@@ -32,6 +32,7 @@ def similarityRequest():
     #return json.dumps(response), 200, [('Content-Type', 'application/json;charset=utf-8')]
     #return rsp, 200, [('Content-Type', 'application/json;charset=utf-8')]
 
+    #决跨域问题
     #response = make_response(jsonify(result_text))
     response = make_response(rsp)
     response.headers['Access-Control-Allow-Origin'] = '*'
