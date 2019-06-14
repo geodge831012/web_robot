@@ -3,8 +3,8 @@
 from flask import Flask
 from flask import request
 from flask import json
-from sentence_similar import process_input_sentence
 from flask import make_response
+from sentence_similar import process_input_sentence
 
 app = Flask(__name__)
 
@@ -33,7 +33,7 @@ def similarityRequest():
     #return rsp, 200, [('Content-Type', 'application/json;charset=utf-8')]
 
     #决跨域问题
-    #response = make_response(jsonify(result_text))
+    #response = make_response(jsonify(response_str))
     response = make_response(rsp)
     response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Methods'] = 'OPTIONS,HEAD,GET,POST'
