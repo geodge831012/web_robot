@@ -45,6 +45,12 @@ class SentenceEmbedding():
         # 意图文件路径
         self.intention_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../data/intention.txt")
 
+        # 意图对应答案的文件路径
+        self.intention_answer_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../data/intention_answer.txt")
+
+        # 意图对应答案的字典
+        self.intention_answer_dict = {}
+
         # idf文件路径
         self.idf_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../data/idf.txt")
 
@@ -98,15 +104,39 @@ class SentenceEmbedding():
         return sentence_embedding, sentence_norm
 
 
+    # 处理所有意图id对应的答案的文件
+    def proc_intention_answer(self):
+
+        for line in open(self.intention_answer_file):
+
+            line_list        = line.strip().split("\t")
+            if(2 != len(line_list)):
+                continue
+
+            intention_id     = int(line_list[0])
+            intention_answer = line_list[1]
+
+            self.intention_answer_dict[intention_id] = intention_answer
+
+
+
+
     # 处理所有的预设的句子
     def proc_intention(self):
+
+        # 处理所有意图id对应的答案的文件
+        self.proc_intention_answer()
 
         start_num = 1
 
         for line in open(self.intention_file):
-            line_list = line.strip().split("\t")
-            intention_id = int(line_list[0])
-            sentence     = line_list[1]
+            line_list        = line.strip().split("\t")
+            if(2 != len(line_list)):
+                continue
+
+            intention_id     = int(line_list[0])
+            sentence         = line_list[1]
+            intention_answer = self.intention_answer_dict.get(intention_id, "我还不知道答案哦!")
 
             sentence_embedding, sentence_norm = self.get_sentence_embedding(sentence)
 
@@ -116,6 +146,7 @@ class SentenceEmbedding():
             sentence_info_dict["sentence"]              = sentence
             sentence_info_dict["sentence_embedding"]    = sentence_embedding
             sentence_info_dict["sentence_norm"]         = sentence_norm
+            sentence_info_dict["intention_answer"]      = intention_answer
 
             start_num += 1
 
@@ -144,12 +175,13 @@ def process_input_sentence(input_sentence):
 
         rst_list.append((sentence_embedding.all_sentence_list[i]["intention_id"], \
                          sentence_embedding.all_sentence_list[i]["sentence"], \
+                         sentence_embedding.all_sentence_list[i]["intention_answer"], \
                          similar_value))
 
-    list.sort(rst_list, key=lambda rs: rs[2], reverse=True)
+    list.sort(rst_list, key=lambda rs: rs[3], reverse=True)
     print(rst_list[0])
 
-    return rst_list[0][0], rst_list[0][1], rst_list[0][2]
+    return rst_list[0][0], rst_list[0][1], rst_list[0][2], rst_list[0][3]
 
 
 
