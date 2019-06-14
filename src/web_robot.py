@@ -4,6 +4,7 @@ from flask import Flask
 from flask import request
 from flask import json
 from sentence_similar import process_input_sentence
+from flask import make_response
 
 app = Flask(__name__)
 
@@ -17,19 +18,26 @@ def similarityRequest():
 
     intention_id, intention_sentence, intention_answer, similar_value = process_input_sentence(input_str)
 
-    response = {
-                    "intention_id"       : intention_id, \
-                    "intention_sentence" : intention_sentence, \
-                    "intention_answer"   : intention_answer, \
-                    "similar_value"      : similar_value \
-                }
+    response_str = {
+                      "intention_id"       : intention_id, \
+                      "intention_sentence" : intention_sentence, \
+                      "intention_answer"   : intention_answer, \
+                      "similar_value"      : similar_value \
+                   }
 
-    rsp = json.dumps(response, ensure_ascii=False)
+    rsp = json.dumps(response_str, ensure_ascii=False)
 
     print("rsp:" + rsp)
 
     #return json.dumps(response), 200, [('Content-Type', 'application/json;charset=utf-8')]
-    return rsp, 200, [('Content-Type', 'application/json;charset=utf-8')]
+    #return rsp, 200, [('Content-Type', 'application/json;charset=utf-8')]
+
+    #response = make_response(jsonify(result_text))
+    response = make_response(rsp)
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'OPTIONS,HEAD,GET,POST'
+    response.headers['Access-Control-Allow-Headers'] = 'x-requested-with'
+    return response
 
 
 
