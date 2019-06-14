@@ -38,6 +38,6 @@ if __name__ == "__main__":
     print("web_robot start...")
 
     #app.run(debug=True)
-    app.run(host="116.62.40.137", port=5000, debug=False)
+    app.run(host="192.168.9.60", port=5000, debug=False)
 
 
