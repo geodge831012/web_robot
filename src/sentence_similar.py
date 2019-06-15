@@ -138,6 +138,9 @@ class SentenceEmbedding():
 
         start_num = 1
 
+        # 存放所有句子的向量的集合
+        all_sentence_embedding_list = []
+
         for line in open(self.intention_file):
             line_list        = line.strip().split("\t")
             if(2 != len(line_list)):
@@ -149,7 +152,7 @@ class SentenceEmbedding():
 
             sentence_embedding, sentence_norm = self.get_sentence_embedding(sentence)
 
-            self.all_sentence_embedding_matrix = np.vstack((self.all_sentence_embedding_matrix, sentence_embedding))
+            all_sentence_embedding_list.append(list(sentence_embedding))
 
             sentence_info_dict = {}
             sentence_info_dict["intention_id"]          = intention_id
@@ -162,6 +165,9 @@ class SentenceEmbedding():
             start_num += 1
 
             self.all_sentence_list.append(sentence_info_dict)
+
+        # 将句子向量集合 转化成为 句子向量矩阵
+        self.all_sentence_embedding_matrix = np.array(all_sentence_embedding_list)
 
 
 sentence_embedding = SentenceEmbedding()
@@ -198,7 +204,7 @@ def process_input_sentence(input_sentence):
     rst_list = list(matrix_dot(sentence_embedding.all_sentence_embedding_matrix, input_sentence_embedding))
 
     for i in range(len(rst_list)):
-        fenmu_float = sentence_embedding.sentence_info_dict[i]["sentence_norm"] * input_sentence_norm
+        fenmu_float = sentence_embedding.all_sentence_list[i]["sentence_norm"] * input_sentence_norm
         if (fenmu_float > 0):
             rst_list[i] /= fenmu_float
 
