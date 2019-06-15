@@ -10,6 +10,12 @@ import time
 
 
 #########################################################################
+## 矩阵相乘 ##
+def matrix_dot(matrix, x):
+    return matrix.dot(x)
+
+
+#########################################################################
 ## 求X Y两个向量的cosine值
 def get_cosine_value(X_list, Y_list, X_norm, Y_norm):
     # 分子 x1*y1 + x2*y2 + ... + xn*yn
@@ -59,6 +65,9 @@ class SentenceEmbedding():
 
         # 所有句子的集合
         self.all_sentence_list = []
+
+        # 所有句子的向量集合 用以矩阵计算得到所有向量cos值  cos(X, Y) = (x1*y1 + x2*y2) / (norm(X) + norm(Y))
+        self.all_sentence_embedding_matrix = np.empty([0, 256], dtype=np.float)
 
 
 
@@ -140,6 +149,8 @@ class SentenceEmbedding():
 
             sentence_embedding, sentence_norm = self.get_sentence_embedding(sentence)
 
+            self.all_sentence_embedding_matrix = np.vstack((self.all_sentence_embedding_matrix, sentence_embedding))
+
             sentence_info_dict = {}
             sentence_info_dict["intention_id"]          = intention_id
             sentence_info_dict["sentence_id"]           = start_num
@@ -164,24 +175,42 @@ def process_input_sentence(input_sentence):
 
     input_sentence_embedding, input_sentence_norm = sentence_embedding.get_sentence_embedding(input_sentence)
 
+    # # 存放结果集合
+    # rst_list = []
+    #
+    # for i in range(len(sentence_embedding.all_sentence_list)):
+    #     similar_value = get_cosine_value(input_sentence_embedding, \
+    #                                      sentence_embedding.all_sentence_list[i]["sentence_embedding"], \
+    #                                      input_sentence_norm, \
+    #                                      sentence_embedding.all_sentence_list[i]["sentence_norm"])
+    #
+    #     rst_list.append((sentence_embedding.all_sentence_list[i]["intention_id"], \
+    #                      sentence_embedding.all_sentence_list[i]["sentence"], \
+    #                      sentence_embedding.all_sentence_list[i]["intention_answer"], \
+    #                      similar_value))
+    #
+    # list.sort(rst_list, key=lambda rs: rs[3], reverse=True)
+    # print(rst_list[0])
+    #
+    # return rst_list[0][0], rst_list[0][1], rst_list[0][2], rst_list[0][3]
+
     # 存放结果集合
-    rst_list = []
+    rst_list = list(matrix_dot(sentence_embedding.all_sentence_embedding_matrix, input_sentence_embedding))
 
-    for i in range(len(sentence_embedding.all_sentence_list)):
-        similar_value = get_cosine_value(input_sentence_embedding, \
-                                         sentence_embedding.all_sentence_list[i]["sentence_embedding"], \
-                                         input_sentence_norm, \
-                                         sentence_embedding.all_sentence_list[i]["sentence_norm"])
+    for i in range(len(rst_list)):
+        fenmu_float = sentence_embedding.sentence_info_dict[i]["sentence_norm"] * input_sentence_norm
+        if (fenmu_float > 0):
+            rst_list[i] /= fenmu_float
 
-        rst_list.append((sentence_embedding.all_sentence_list[i]["intention_id"], \
-                         sentence_embedding.all_sentence_list[i]["sentence"], \
-                         sentence_embedding.all_sentence_list[i]["intention_answer"], \
-                         similar_value))
+    pos = rst_list.index(max(rst_list))
 
-    list.sort(rst_list, key=lambda rs: rs[3], reverse=True)
-    print(rst_list[0])
+    sentence_info_dict = sentence_embedding.all_sentence_list[pos]
 
-    return rst_list[0][0], rst_list[0][1], rst_list[0][2], rst_list[0][3]
+    return sentence_info_dict["intention_id"], sentence_info_dict["sentence"], sentence_info_dict["intention_answer"], rst_list[pos]
+
+
+
+
 
 
 
