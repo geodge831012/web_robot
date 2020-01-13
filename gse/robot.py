@@ -18,7 +18,7 @@ def load_intention_answer_file():
 
         line_list   = line.strip().split("\t")
         if 2 != len(line_list):
-            print(line + "is not 2 sep")
+            print(line + "is not 2 sep, intention_answer")
         intention   = int(line_list[0])
         answer      = line_list[-1]
 
@@ -43,7 +43,7 @@ def init():
 
         line_list   = line.strip().split("\t")
         if 2 != len(line_list):
-            print(line + "is not 2 sep")
+            print(line + "is not 2 sep, intention")
         intention   = int(line_list[0])
         question    = line_list[-1]
 
